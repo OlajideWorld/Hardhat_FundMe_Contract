@@ -1,6 +1,6 @@
-# Sample Hardhat Project
+# Hardhat FundMe Project
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a Hardhat Ignition module that deploys that contract.
+This project demonstrates a unique contract usage on the blockchain, here we worked on a Fundme Contract and deployed to a sepolia text chain
 
 Try running some of the following tasks:
 
