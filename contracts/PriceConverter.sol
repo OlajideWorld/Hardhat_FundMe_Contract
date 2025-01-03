@@ -11,10 +11,12 @@ library PriceConverter {
         return priceFeed.decimals();
     }
 
-    function getPrice() internal view returns (uint256) {
-        AggregatorV3Interface priceFeed = AggregatorV3Interface(
-            0x694AA1769357215DE4FAC081bf1f309aDC325306
-        );
+    function getPrice(
+        AggregatorV3Interface priceFeed
+    ) internal view returns (uint256) {
+        // AggregatorV3Interface priceFeed = AggregatorV3Interface(
+        //     0x694AA1769357215DE4FAC081bf1f309aDC325306
+        // );
 
         (
             ,
@@ -29,8 +31,11 @@ library PriceConverter {
         return uint256(price * 1e10);
     }
 
-    function getConverter(uint256 amount) internal view returns (uint256) {
-        uint256 usdValue = getPrice();
+    function getConverter(
+        uint256 amount,
+        AggregatorV3Interface priceFeed
+    ) internal view returns (uint256) {
+        uint256 usdValue = getPrice(priceFeed);
         uint256 ethConverted = (usdValue * amount) / 1e18;
 
         return ethConverted;

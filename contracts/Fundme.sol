@@ -14,8 +14,11 @@ contract Fundme {
 
     address[] public fundersList;
 
-    constructor() {
+    AggregatorV3Interface public priceFeed;
+
+    constructor(address priceFeedAddress) {
         Owner = msg.sender;
+        priceFeed = AggregatorV3Interface(priceFeedAddress);
     }
 
     modifier checkOwner() {
@@ -25,7 +28,7 @@ contract Fundme {
 
     function fund() public payable {
         require(
-            msg.value.getConverter() >= MINIMUM_AMOUNT,
+            msg.value.getConverter(priceFeed) >= MINIMUM_AMOUNT,
             "Sorry the minimum amount is 50 USD"
         );
         funderToAmountFunded[msg.sender] = msg.value;
