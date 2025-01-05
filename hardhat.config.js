@@ -1,4 +1,15 @@
 require("@nomicfoundation/hardhat-toolbox");
+require("hardhat-deploy");
+require("hardhat-gas-reporter");
+require("solidity-coverage");
+const dotenv = require("dotenv");
+
+dotenv.config();
+
+const sepoliaRpc = process.env.jsonRpcSepolia;
+const privateKey = process.env.sepolia_privatekey;
+const etherscan_key = process.env.ETHERSCAN_API_KEY;
+const coinmarketcpa_Apikey = process.env.COINMARKETCAP_API_KEY;
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
