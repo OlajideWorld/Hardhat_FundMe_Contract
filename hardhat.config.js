@@ -42,4 +42,12 @@ module.exports = {
     coinmarketcap: coinmarketcpa_Apikey, // to get the rate of the gas
     L1Etherscan: etherscan_key, // to get the gas for ETH
   },
+  namedAccounts: {
+    deployer: {
+      default: 0,
+    },
+    user: {
+      default: 1,
+    },
+  },
 };
