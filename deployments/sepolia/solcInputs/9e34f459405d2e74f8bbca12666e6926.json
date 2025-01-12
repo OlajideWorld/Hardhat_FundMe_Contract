@@ -1,0 +1,42 @@
+{
+  "language": "Solidity",
+  "sources": {
+    "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol": {
+      "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\n\n// solhint-disable-next-line interface-starts-with-i\ninterface AggregatorV3Interface {\n  function decimals() external view returns (uint8);\n\n  function description() external view returns (string memory);\n\n  function version() external view returns (uint256);\n\n  function getRoundData(\n    uint80 _roundId\n  ) external view returns (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound);\n\n  function latestRoundData()\n    external\n    view\n    returns (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound);\n}\n"
+    },
+    "contracts/Fundme.sol": {
+      "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.9;\n\nimport \"contracts/PriceConverter.sol\";\n\nerror UnAuthorized();\n\ncontract Fundme {\n    using PriceConverter for uint256;\n\n    address private immutable Owner;\n\n    uint256 constant MINIMUM_AMOUNT = 50 * 1e18;\n\n    mapping(address => uint256) public funderToAmountFunded;\n\n    address[] public fundersList;\n\n    AggregatorV3Interface public priceFeed;\n\n    constructor(address priceFeedAddress) {\n        Owner = msg.sender;\n        priceFeed = AggregatorV3Interface(priceFeedAddress);\n    }\n\n    modifier checkOwner() {\n        // require(msg.sender == Owner, \"You cannot get the funds\");\n        if (msg.sender != Owner) {\n            revert UnAuthorized();\n        }\n        _;\n    }\n\n    function fund() public payable {\n        require(\n            msg.value.getConverter(priceFeed) >= MINIMUM_AMOUNT,\n            \"Sorry the minimum amount is 50 USD\"\n        );\n        funderToAmountFunded[msg.sender] = msg.value;\n        fundersList.push(msg.sender);\n    }\n\n    function withdraw() public checkOwner {\n        for (uint i = 0; i < fundersList.length; i++) {\n            address funderDetails = fundersList[i];\n            funderToAmountFunded[funderDetails] = 0;\n        }\n\n        fundersList = new address[](0);\n\n        // Transfer Method (not recommended)\n        // payable(msg.sender).transfer(address(this).balance);\n\n        // Send Method (not recommended)\n        // bool success = payable(msg.sender).send(address(this).balance);\n\n        // Call Method\n        (bool callsuccess, ) = payable(msg.sender).call{\n            value: address(this).balance\n        }(\"\");\n        require(callsuccess, \"Unable to send to address\");\n    }\n\n    receive() external payable {\n        fund();\n    }\n\n    fallback() external payable {\n        fund();\n    }\n}\n"
+    },
+    "contracts/PriceConverter.sol": {
+      "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.9;\n\nimport \"@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol\";\n\nlibrary PriceConverter {\n    // function decimals() internal view returns (uint256) {\n    //     AggregatorV3Interface priceFeed = AggregatorV3Interface(\n    //         0x694AA1769357215DE4FAC081bf1f309aDC325306\n    //     );\n    //     return priceFeed.decimals();\n    // }\n\n    function getPrice(\n        AggregatorV3Interface priceFeed\n    ) internal view returns (uint256) {\n        // AggregatorV3Interface priceFeed = AggregatorV3Interface(\n        //     0x694AA1769357215DE4FAC081bf1f309aDC325306\n        // );\n\n        (\n            ,\n            /* uint80 roundID */ int price /*uint startedAt*/ /*uint timeStamp*/ /*uint80 answeredInRound*/,\n            ,\n            ,\n\n        ) = priceFeed.latestRoundData();\n\n        //3351.47530000\n        // 3351.475300000000000000\n        return uint256(price * 1e10);\n    }\n\n    function getConverter(\n        uint256 amount,\n        AggregatorV3Interface priceFeed\n    ) internal view returns (uint256) {\n        uint256 usdValue = getPrice(priceFeed);\n        uint256 ethConverted = (usdValue * amount) / 1e18;\n\n        return ethConverted;\n    }\n}\n"
+    }
+  },
+  "settings": {
+    "evmVersion": "paris",
+    "optimizer": {
+      "enabled": false,
+      "runs": 200
+    },
+    "outputSelection": {
+      "*": {
+        "*": [
+          "abi",
+          "evm.bytecode",
+          "evm.deployedBytecode",
+          "evm.methodIdentifiers",
+          "metadata",
+          "devdoc",
+          "userdoc",
+          "storageLayout",
+          "evm.gasEstimates"
+        ],
+        "": [
+          "ast"
+        ]
+      }
+    },
+    "metadata": {
+      "useLiteralContent": true
+    }
+  }
+}

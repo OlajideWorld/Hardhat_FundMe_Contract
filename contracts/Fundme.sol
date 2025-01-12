@@ -3,7 +3,23 @@ pragma solidity ^0.8.9;
 
 import "contracts/PriceConverter.sol";
 
+error UnAuthorized();
+
+/// @author Rutedor @olajideWorld - Blockchain developer
+/// @title A Crowd-Funding Contract for Blockchain Enthusiast
+
 contract Fundme {
+    // Some NAT-SPEC FORMAT FOR YOUR SOLIDITY CODES
+
+    /// @title A simulator for trees
+    /// @author Larry A. Gardner
+    /// @notice You can use this contract for only the most basic simulation
+    /// @dev All function calls are currently implemented without side effects
+    /// @custom:experimental This is an experimental contract.
+    /// @return Age in years, rounded up for partial years
+    /// @param rings The number of rings from dendrochronological sample
+    /// @inheritdoc Tree
+    /** made by OlajideWord */
     using PriceConverter for uint256;
 
     address private immutable Owner;
@@ -22,7 +38,10 @@ contract Fundme {
     }
 
     modifier checkOwner() {
-        require(msg.sender == Owner, "You cannot get the funds");
+        // require(msg.sender == Owner, "You cannot get the funds");
+        if (msg.sender != Owner) {
+            revert UnAuthorized();
+        }
         _;
     }
 

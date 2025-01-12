@@ -7,19 +7,35 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const sepoliaRpc = process.env.jsonRpcSepolia;
-const privateKey = process.env.sepolia_privatekey;
+const amoyRpc = process.env.jsonRpcAmoy;
+const sepoliaPrivateKey = process.env.sepolia_privatekey;
+const amoyPrivateKey = process.env.amoy_privatekey;
+
+/////////////////////////
 const etherscan_key = process.env.ETHERSCAN_API_KEY;
 const coinmarketcpa_Apikey = process.env.COINMARKETCAP_API_KEY;
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
-  solidity: "0.8.28",
+  // solidity: "0.8.28",  // if you want to compile with a single type of solidity version
+  solidity: {
+    // if you want to compile a different versions of solidity
+    compilers: [{ version: "0.8.28" }, { version: "0.6.6" }],
+  },
   networks: {
     sepolia: {
       // how to add your preferred chain to deploy to
       url: sepoliaRpc, // add your RPC
-      accounts: [privateKey], // add your private keys
+      accounts: [sepoliaPrivateKey], // add your private keys
       chainId: 11155111, // chain Id
+      blockConfirmations: 6, // you can set the number here before it verifies your contract on the network
+    },
+    amoy: {
+      // how to add your preferred chain to deploy to
+      url: amoyRpc, // add your RPC
+      accounts: [amoyPrivateKey], // add your private keys
+      chainId: 80002, // chain Id
+      blockConfirmations: 6, // you can set the number here before it verifies your contract on the network
     },
     localhost: {
       // local server for deploying your contract and test your contract
