@@ -1,10 +1,22 @@
 require("@nomicfoundation/hardhat-toolbox");
 require("hardhat-deploy");
+require("@nomicfoundation/hardhat-chai-matchers");
 require("hardhat-gas-reporter");
 require("solidity-coverage");
 const dotenv = require("dotenv");
+// require("./tasks/get_accounts.js");
 
 dotenv.config();
+
+task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
+  const accounts = await ethers.getSigners();
+
+  console.log(`account 1 : ${accounts[1]}`);
+
+  // for (const account of accounts) {
+  //   console.log(account.address);
+  // }
+});
 
 const sepoliaRpc = process.env.jsonRpcSepolia;
 const amoyRpc = process.env.jsonRpcAmoy;

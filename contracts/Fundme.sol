@@ -3,7 +3,7 @@ pragma solidity ^0.8.9;
 
 import "contracts/PriceConverter.sol";
 
-error UnAuthorized();
+error Fundme__UnAuthorized();
 
 /// @author Rutedor @olajideWorld - Blockchain developer
 /// @title A Crowd-Funding Contract for Blockchain Enthusiast
@@ -40,7 +40,7 @@ contract Fundme {
     modifier checkOwner() {
         // require(msg.sender == Owner, "You cannot get the funds");
         if (msg.sender != Owner) {
-            revert UnAuthorized();
+            revert Fundme__UnAuthorized();
         }
         _;
     }

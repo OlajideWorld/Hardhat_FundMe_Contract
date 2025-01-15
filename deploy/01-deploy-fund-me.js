@@ -48,8 +48,8 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
 
   if (!developmentChains.includes(network.name)) {
     await verify(fundme.address, args);
-    log("")
-    log("Verification done _________ 100%")
+    log("");
+    log("Verification done _________ 100%");
   }
 };
 
