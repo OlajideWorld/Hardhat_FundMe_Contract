@@ -5,6 +5,10 @@ import "contracts/PriceConverter.sol";
 
 error Fundme__UnAuthorized();
 
+error Fundme__InsufficientFund();
+
+error Fundme__FailedTransfer();
+
 /// @author Rutedor @olajideWorld - Blockchain developer
 /// @title A Crowd-Funding Contract for Blockchain Enthusiast
 
@@ -26,15 +30,23 @@ contract Fundme {
 
     uint256 constant MINIMUM_AMOUNT = 50 * 1e18;
 
-    mapping(address => uint256) public funderToAmountFunded;
+    mapping(address => uint256) private funderToAmountFunded;
 
-    address[] public fundersList;
+    address[] private fundersList;
 
-    AggregatorV3Interface public priceFeed;
+    AggregatorV3Interface private priceFeed;
 
     constructor(address priceFeedAddress) {
         Owner = msg.sender;
         priceFeed = AggregatorV3Interface(priceFeedAddress);
+    }
+
+    receive() external payable {
+        fund();
+    }
+
+    fallback() external payable {
+        fund();
     }
 
     modifier checkOwner() {
@@ -46,10 +58,13 @@ contract Fundme {
     }
 
     function fund() public payable {
-        require(
-            msg.value.getConverter(priceFeed) >= MINIMUM_AMOUNT,
-            "Sorry the minimum amount is 50 USD"
-        );
+        // require(
+        //     msg.value.getConverter(priceFeed) >= MINIMUM_AMOUNT,
+        //     "Sorry the minimum amount is 50 USD"
+        // );
+        if (msg.value.getConverter(priceFeed) < MINIMUM_AMOUNT) {
+            revert Fundme__InsufficientFund();
+        }
         funderToAmountFunded[msg.sender] = msg.value;
         fundersList.push(msg.sender);
     }
@@ -75,11 +90,52 @@ contract Fundme {
         require(callsuccess, "Unable to send to address");
     }
 
-    receive() external payable {
-        fund();
+    /// @notice this is a much cheaper gas friendly withdraw() function
+    function cheaperWithdraw() public checkOwner {
+        address[] memory fundersNew = fundersList;
+
+        for (uint i = 0; i < fundersNew.length; i++) {
+            address peopleFunded = fundersNew[i];
+            funderToAmountFunded[peopleFunded] = 0;
+        }
+
+        fundersList = new address[](0);
+
+        (bool callsuccess, ) = payable(msg.sender).call{
+            value: address(this).balance
+        }("");
+
+        if (!callsuccess) {
+            revert Fundme__FailedTransfer();
+        }
     }
 
-    fallback() external payable {
-        fund();
+    // view and pure functions
+
+    /// @notice you can use this function to get the Owner
+    function getOwner() public view returns (address) {
+        return Owner;
+    }
+
+    /// @notice you can use this function to get the Amount funded by an address
+    function getFundersAmount(
+        address userAddress
+    ) public view returns (uint256) {
+        return funderToAmountFunded[userAddress];
+    }
+
+    /// @notice you can use this function to get all the funders of the contract
+    function getfunders() public view returns (address[] memory) {
+        return fundersList;
+    }
+
+    /// @notice you can use this function to get a single Funder address in the List
+    function getFunder(uint256 index) public view returns (address) {
+        return fundersList[index];
+    }
+
+    /// @notice you can use this function to get the priceFeed contract address
+    function getPriceFeed() public view returns (AggregatorV3Interface) {
+        return priceFeed;
     }
 }

@@ -4,10 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "yarn hardhat test",
+    "test2": "yarn hardhat test --network sepolia",
+    "compile": "yarn hardhat compile",
+    "run fund": "yarn hardhat run ignition/modules/fund.js",
+    "run withdraw": "yarn hardhat run ignition/modules/withdraw.js",
+    "coverage": "yarn hardhat coverage"
   },
   "keywords": [],
-  "author": "",
+  "author": "Olajide Codes",
   "license": "ISC",
   "devDependencies": {
     "@chainlink/contracts": "^1.3.0",
