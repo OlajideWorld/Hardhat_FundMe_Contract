@@ -2,12 +2,12 @@ const { getNamedAccounts, deployments, network, ethers } = require("hardhat");
 const { developmentChains } = require("../../helper-hardhat.config.js");
 const { assert } = require("chai");
 
-describe("Fundme Contract", async function () {
-  let fundme;
-  let deployer;
-  developmentChains.includes(network.name)
-    ? describe.skip()
-    : beforeEach(async function () {
+developmentChains.includes(network.name)
+  ? describe.skip
+  : describe("Fundme Contract", async function () {
+      let fundme;
+      let deployer;
+      beforeEach(async function () {
         deployer = (await getNamedAccounts()).deployer;
         const fundmeContract = await deployments.get("Fundme");
         fundme = await ethers.getContractAt(
@@ -16,13 +16,15 @@ describe("Fundme Contract", async function () {
         );
       });
 
-  it("fund", async function () {
-    await fundme.fund({ value: ethers.parseEther("0.02") });
-    await fundme.withdraw();
-    const endingFudmeBalance = await fundme.provider.getBalance(fundme.address);
-    // const endingFudmeBalance2 = await ethers.provider.getBalance(
-    //   fundme.address
-    // );
-    assert.equal(endingFudmeBalance.toString(), "0");
-  });
-});
+      it("fund", async function () {
+        await fundme.fund({ value: ethers.parseEther("0.016") });
+        await fundme.withdraw();
+        const endingFudmeBalance = await ethers.provider.getBalance(
+          fundme.address
+        );
+        // const endingFudmeBalance2 = await ethers.provider.getBalance(
+        //   fundme.address
+        // );
+        assert.equal(endingFudmeBalance.toString(), "0");
+      });
+    });
